@@ -1,0 +1,93 @@
+import Appointment from "../models/appointment.model.js";
+import DoctorProfile from "../models/doctorprofile.model.js";
+
+// Get all appointments by doctor's user ID
+export const getAppointmentsByDoctor = async (req, res) => {
+  try {
+    const appointments = await Appointment.find({ doctor: req.params.doctorId })
+    .populate("patient", "name email"); // Populate patient details;
+    res.status(200).json(appointments);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching appointments", error });
+  }
+};
+
+// Get a single appointment by ID
+export const getAppointmentById = async (req, res) => {
+  try {
+    const appointment = await Appointment.findById(req.params.appointmentId)
+      .populate("doctor", "name")
+      .populate("patient", "name email");
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+    res.status(200).json(appointment);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching appointment", error });
+  }
+};
+
+// Create a new appointment
+export const createAppointment = async (req, res) => {
+  try {
+    const newAppointment = new Appointment(req.body);
+    const savedAppointment = await newAppointment.save();
+    res.status(201).json(savedAppointment);
+  } catch (error) {
+    res.status(500).json({ message: "Error creating appointment", error });
+  }
+};
+
+// Delete an appointment
+export const deleteAppointment = async (req, res) => {
+  try {
+    await Appointment.findByIdAndDelete(req.params.appointmentId);
+    res.status(200).json({ message: "Appointment deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting appointment", error });
+  }
+};
+
+// Edit an appointment
+export const editAppointment = async (req, res) => {
+  try {
+    const updatedAppointment = await Appointment.findByIdAndUpdate(
+      req.params.appointmentId,
+      req.body,
+      { new: true }
+    );
+    res.status(200).json(updatedAppointment);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating appointment", error });
+  }
+};
+
+// Get available slots by doctor's user ID
+export const getAvailableSlots = async (req, res) => {
+  try {
+    const doctorProfile = await DoctorProfile.findOne({ user: req.params.doctorId });
+    if (!doctorProfile) {
+      return res.status(404).json({ message: "Doctor profile not found" });
+    }
+    res.status(200).json(doctorProfile.availableSlots);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching available slots", error });
+  }
+};
+
+// Update available slots for a doctor
+export const updateAvailableSlots = async (req, res) => {
+  try {
+    const doctorProfile = await DoctorProfile.findOneAndUpdate(
+      { user: req.params.doctorId },
+      { availableSlots: req.body.availableSlots },
+      { new: true }
+    );
+    if (!doctorProfile) {
+      return res.status(404).json({ message: "Doctor profile not found" });
+    }
+    res.status(200).json(doctorProfile);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating available slots", error });
+  }
+};
