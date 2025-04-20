@@ -105,26 +105,6 @@ export default function LoggedInPage() {
   const roleActions = {
     doctor: [
       {
-        title: "Upcoming Appointments",
-        path: "/doctor/appointments",
-        icon: (
-          <svg
-            className="w-5 h-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-        ),
-      },
-      {
         title: "My Patients",
         path: "/doctor/patients",
         icon: (
@@ -144,6 +124,47 @@ export default function LoggedInPage() {
           </svg>
         ),
       },
+      {
+        title: "Schedule Appointment",
+        path: "/doctor/schedule_appointment",
+        icon: (
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
+          </svg>
+        ),
+      },
+      {
+        title: "Upcoming Appointments",
+        path: "/doctor/appointments",
+        icon: (
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+        ),
+      },
+
       {
         title: "Past Appointments",
         path: "/doctor/past_consultations",
@@ -404,9 +425,6 @@ export default function LoggedInPage() {
             <h1 className="text-4xl md:text-5xl font-bold text-blue-200 mb-2">
               Welcome, <span className="text-blue-500">{user.name}</span>
             </h1>
-            <p className="text-gray-400 text-lg">
-              Your healthcare dashboard is ready for you
-            </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
