@@ -1,11 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 const PastConsultationsPage = () => {
   const [consultations, setConsultations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchConsultations = async () => {
@@ -34,6 +37,10 @@ const PastConsultationsPage = () => {
 
     fetchConsultations();
   }, []);
+
+  const viewAppointmentDetails = (appointmentId) => {
+    router.push(`/doctor/appointments/dashboard/${appointmentId}`);
+  };
 
   if (loading) {
     return (
@@ -70,10 +77,16 @@ const PastConsultationsPage = () => {
               <p className="text-gray-700">
                 Reason: {consultation.reason || "Not specified"}
               </p>
-              <div className="mt-2">
+              <div className="mt-2 flex justify-between items-center">
                 <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
                   Completed
                 </span>
+                <Button
+                  onClick={() => viewAppointmentDetails(consultation._id)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                >
+                  View Details
+                </Button>
               </div>
             </li>
           ))}
