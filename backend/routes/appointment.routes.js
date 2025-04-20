@@ -11,6 +11,7 @@ import {
   getPatientCompletedAppointments,
 } from "../controllers/appointment.controller.js";
 import { verifyToken, isDoctor } from "../middleware/auth.middleware.js";
+import upload from "../utils/upload.js";
 
 const router = express.Router();
 
@@ -64,6 +65,7 @@ router.post(
   "/:appointmentId/diagnostic-report",
   verifyToken,
   isDoctor,
+  upload.single("file"), // Add multer middleware to handle file upload
   addDiagnosticReport
 );
 

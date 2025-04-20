@@ -2,6 +2,8 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 import authRoutes from "./routes/authroutes.js";
 import userRoutes from "./routes/userroutes.js";
 import doctorProfileRoutes from "./routes/doctorprofile.routes.js";
@@ -11,12 +13,19 @@ import pharmacistProfileRoutes from "./routes/pharmacistprofile.routes.js";
 import appointmentRoutes from "./routes/appointment.routes.js";
 dotenv.config();
 
+// Get __dirname equivalent in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 
 // Middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from the uploads directory
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // MongoDB connection
 mongoose

@@ -1,6 +1,8 @@
 import Appointment from "../models/appointment.model.js";
 import MedicalRecord from "../models/medicalrecord.model.js";
 import Prescription from "../models/prescription.model.js";
+import path from "path";
+import fs from "fs";
 
 // Get all appointments for a doctor
 const getAppointments = async (req, res) => {
@@ -197,7 +199,12 @@ const updateMedicalRecord = async (req, res) => {
 const addDiagnosticReport = async (req, res) => {
   try {
     const { appointmentId } = req.params;
-    const { name, fileUrl } = req.body;
+    const { name } = req.body;
+
+    // Check for file upload
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
 
     const appointment = await Appointment.findById(appointmentId);
 
@@ -205,6 +212,20 @@ const addDiagnosticReport = async (req, res) => {
       return res.status(404).json({ error: "Appointment not found" });
     }
 
+    // Check if this doctor is authorized to update this appointment
+    if (appointment.doctor.toString() !== req.user._id.toString()) {
+      // Remove the uploaded file as we're not going to use it
+      fs.unlinkSync(req.file.path);
+      return res
+        .status(403)
+        .json({ error: "Not authorized to update this appointment" });
+    }
+
+    // Generate full file URL (including backend URL)
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
+    const fileUrl = `${backendUrl}/uploads/${path.basename(req.file.path)}`;
+
+    // Add the diagnostic report to the appointment
     appointment.diagnosticReports.push({
       name,
       fileUrl,
@@ -216,6 +237,14 @@ const addDiagnosticReport = async (req, res) => {
     res.status(200).json(updatedAppointment);
   } catch (error) {
     console.error("Error adding diagnostic report:", error);
+    // If there was an uploaded file, clean it up
+    if (req.file && req.file.path) {
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (unlinkErr) {
+        console.error("Error removing file after error:", unlinkErr);
+      }
+    }
     res.status(500).json({ error: "Failed to add diagnostic report" });
   }
 };
