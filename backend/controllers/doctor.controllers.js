@@ -97,7 +97,11 @@ export const getAvailableSlots = async (req, res) => {
     if (!doctorProfile) {
       return res.status(404).json({ message: "Doctor profile not found" });
     }
-    res.status(200).json(doctorProfile.availableSlots);
+
+    // Return only weekly recurring slots
+    res.status(200).json({
+      weeklyRecurringSlots: doctorProfile.weeklyRecurringSlots || [],
+    });
   } catch (error) {
     res.status(500).json({ message: "Error fetching available slots", error });
   }
@@ -106,17 +110,85 @@ export const getAvailableSlots = async (req, res) => {
 // Update available slots for a doctor
 export const updateAvailableSlots = async (req, res) => {
   try {
+    // Only handle weekly recurring slots
+    if (!req.body.weeklyRecurringSlots) {
+      return res
+        .status(400)
+        .json({ message: "Weekly recurring slots are required" });
+    }
+
     const doctorProfile = await DoctorProfile.findOneAndUpdate(
       { user: req.params.doctorId },
-      { availableSlots: req.body.availableSlots },
+      { weeklyRecurringSlots: req.body.weeklyRecurringSlots },
       { new: true }
     );
+
     if (!doctorProfile) {
       return res.status(404).json({ message: "Doctor profile not found" });
     }
+
     res.status(200).json(doctorProfile);
   } catch (error) {
     res.status(500).json({ message: "Error updating available slots", error });
+  }
+};
+
+// Add a new weekly recurring slot
+export const addWeeklyRecurringSlot = async (req, res) => {
+  try {
+    const { day, startTime, endTime } = req.body;
+
+    if (!day || !startTime || !endTime) {
+      return res.status(400).json({
+        message: "Day, start time, and end time are required",
+      });
+    }
+
+    const doctorProfile = await DoctorProfile.findOne({
+      user: req.params.doctorId,
+    });
+
+    if (!doctorProfile) {
+      return res.status(404).json({ message: "Doctor profile not found" });
+    }
+
+    // Add the new recurring slot
+    doctorProfile.weeklyRecurringSlots.push({ day, startTime, endTime });
+    await doctorProfile.save();
+
+    res.status(200).json(doctorProfile);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error adding weekly recurring slot", error });
+  }
+};
+
+// Delete a weekly recurring slot
+export const deleteWeeklyRecurringSlot = async (req, res) => {
+  try {
+    const { slotId } = req.params;
+
+    const doctorProfile = await DoctorProfile.findOne({
+      user: req.params.doctorId,
+    });
+
+    if (!doctorProfile) {
+      return res.status(404).json({ message: "Doctor profile not found" });
+    }
+
+    // Remove the slot with the given ID
+    doctorProfile.weeklyRecurringSlots.id(slotId).remove();
+    await doctorProfile.save();
+
+    res.status(200).json({
+      message: "Weekly recurring slot deleted successfully",
+      doctorProfile,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error deleting weekly recurring slot", error });
   }
 };
 

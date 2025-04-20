@@ -8,6 +8,8 @@ import {
   updateAvailableSlots,
   getAppointmentById,
   getPastConsultationsByDoctor,
+  addWeeklyRecurringSlot,
+  deleteWeeklyRecurringSlot,
 } from "../controllers/doctor.controllers.js";
 
 const router = express.Router();
@@ -35,5 +37,11 @@ router.get("/:doctorId/available-slots", getAvailableSlots);
 
 // Update available slots for a doctor
 router.put("/:doctorId/available-slots", updateAvailableSlots);
+
+// Add weekly recurring slot
+router.post("/:doctorId/weekly-slots", addWeeklyRecurringSlot);
+
+// Delete a weekly recurring slot
+router.delete("/:doctorId/weekly-slots/:slotId", deleteWeeklyRecurringSlot);
 
 export default router;
