@@ -3,11 +3,13 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function PatientPastAppointmentsPage() {
   const [pastAppointments, setPastAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchPastAppointments = async () => {
@@ -126,11 +128,15 @@ export default function PatientPastAppointmentsPage() {
 
                 <div className="mt-6 flex justify-end">
                   {appointment.prescription && (
-                    <Button variant="outline" className="mr-2">
+                    <Button 
+                      variant="outline" 
+                      className="mr-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+                      onClick={() => router.push(`/patient/prescription/${appointment.prescription}`)}
+                    >
                       View Prescription
                     </Button>
                   )}
-                  <Button>View Details</Button>
+                  <Button onClick={() => router.push(`/patient/appointment/${appointment._id}`)}>View Details</Button>
                 </div>
               </div>
             </Card>
