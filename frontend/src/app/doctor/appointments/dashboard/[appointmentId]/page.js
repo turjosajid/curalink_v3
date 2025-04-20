@@ -531,39 +531,62 @@ function PrescriptionTab({ appointment, setAppointment, appointmentId }) {
 
 function ReportsTab({ appointment, setAppointment, appointmentId }) {
   const [reportName, setReportName] = useState("");
-  const [fileUrl, setFileUrl] = useState("");
+  const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!file) {
+      setError("Please select a file to upload");
+      return;
+    }
+
     setUploading(true);
     setError(null);
     setSuccess(false);
+    setUploadProgress(0);
 
     try {
       const token = localStorage.getItem("token");
+
+      // Create FormData object to send the file
+      const formData = new FormData();
+      formData.append("name", reportName);
+      formData.append("file", file);
+
       const response = await axios.post(
         `http://localhost:5000/api/appointments/${appointmentId}/diagnostic-report`,
-        {
-          name: reportName,
-          fileUrl,
-        },
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setUploadProgress(percentCompleted);
           },
         }
       );
 
       setAppointment(response.data);
       setReportName("");
-      setFileUrl("");
+      setFile(null);
       setSuccess(true);
     } catch (err) {
-      console.error("Error adding diagnostic report:", err);
-      setError(err.message || "Failed to add diagnostic report");
+      console.error("Error uploading diagnostic report:", err);
+      setError(err.message || "Failed to upload diagnostic report");
     } finally {
       setUploading(false);
     }
@@ -623,33 +646,47 @@ function ReportsTab({ appointment, setAppointment, appointmentId }) {
 
           <div className="mb-6">
             <label
-              htmlFor="fileUrl"
+              htmlFor="reportFile"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              File URL
+              Upload File
             </label>
             <input
-              id="fileUrl"
-              type="url"
+              id="reportFile"
+              type="file"
               className="w-full p-2 border rounded-md"
-              value={fileUrl}
-              onChange={(e) => setFileUrl(e.target.value)}
-              placeholder="https://example.com/report.pdf"
+              onChange={handleFileChange}
               required
+              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Enter a URL to the uploaded file. In a production app, you&apos;d
-              have a file upload component here.
+              Supported file types: PDF, JPG, JPEG, PNG, DOC, DOCX
             </p>
           </div>
 
+          {uploading && (
+            <div className="mb-4">
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className="bg-blue-600 h-2.5 rounded-full"
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">
+                Uploading: {uploadProgress}%
+              </p>
+            </div>
+          )}
+
           {error && <div className="text-red-500 mb-4">{error}</div>}
           {success && (
-            <div className="text-green-500 mb-4">Report added successfully</div>
+            <div className="text-green-500 mb-4">
+              Report uploaded successfully
+            </div>
           )}
 
           <Button type="submit" disabled={uploading}>
-            {uploading ? "Adding..." : "Add Report"}
+            {uploading ? "Uploading..." : "Upload Report"}
           </Button>
         </form>
       </div>
