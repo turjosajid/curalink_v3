@@ -21,7 +21,13 @@ const AppointmentsPage = () => {
         `http://localhost:5000/api/doctors/${user}/appointments`
       );
       console.log("Fetched appointments:", response.data); // Debugging line to check fetched data
-      setAppointments(response.data);
+      // Filter out completed and rejected appointments
+      const upcomingAppointments = response.data.filter(
+        (appointment) =>
+          appointment.status !== "completed" &&
+          appointment.status !== "rejected"
+      );
+      setAppointments(upcomingAppointments);
     } catch (error) {
       console.error("Error fetching appointments:", error);
     }
