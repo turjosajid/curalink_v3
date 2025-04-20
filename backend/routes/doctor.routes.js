@@ -1,18 +1,22 @@
 import express from "express";
 import {
-    getAppointmentsByDoctor,
-    createAppointment,
-    deleteAppointment,
-    editAppointment,    
-    getAvailableSlots,   
-    updateAvailableSlots,
-    getAppointmentById,
+  getAppointmentsByDoctor,
+  createAppointment,
+  deleteAppointment,
+  editAppointment,
+  getAvailableSlots,
+  updateAvailableSlots,
+  getAppointmentById,
+  getPastConsultationsByDoctor,
 } from "../controllers/doctor.controllers.js";
 
 const router = express.Router();
 
 // Get all appointments by doctor's user ID
 router.get("/:doctorId/appointments", getAppointmentsByDoctor);
+
+// Get past consultations (completed appointments) by doctor's user ID
+router.get("/:doctorId/past-consultations", getPastConsultationsByDoctor);
 
 // Create a new appointment
 router.post("/appointments", createAppointment);

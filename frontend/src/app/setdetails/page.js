@@ -19,7 +19,14 @@ export default function SetDetails() {
     e.preventDefault();
     const formData = new FormData(e.target);
     const formObject = Object.fromEntries(formData.entries());
-    const { specialization, qualifications, experienceYears, phone, gender, bio } = formObject;
+    const {
+      specialization,
+      qualifications,
+      experienceYears,
+      phone,
+      gender,
+      bio,
+    } = formObject;
 
     try {
       await axios.post(
@@ -51,7 +58,17 @@ export default function SetDetails() {
     e.preventDefault();
     const formData = new FormData(e.target);
     const formObject = Object.fromEntries(formData.entries());
-    const { age, gender, phone, address, bloodGroup, allergies, emergencyName, emergencyPhone, emergencyRelation } = formObject;
+    const {
+      age,
+      gender,
+      phone,
+      address,
+      bloodGroup,
+      allergies,
+      emergencyName,
+      emergencyPhone,
+      emergencyRelation,
+    } = formObject;
 
     try {
       await axios.post(
@@ -113,12 +130,15 @@ export default function SetDetails() {
     }
   };
 
-  if (!role) return <p className="text-center text-gray-400 mt-10">Loading...</p>;
+  if (!role)
+    return <p className="text-center text-gray-400 mt-10">Loading...</p>;
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 flex flex-col items-center justify-center p-6">
       <div className="bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-lg">
-        <h1 className="text-3xl font-extrabold text-gray-100 mb-6 border-b border-gray-700 pb-4">Set {role} Details</h1>
+        <h1 className="text-3xl font-extrabold text-gray-100 mb-6 border-b border-gray-700 pb-4">
+          Set {role} Details
+        </h1>
         <form
           className="flex flex-col gap-4"
           onSubmit={
@@ -131,36 +151,130 @@ export default function SetDetails() {
         >
           {role === "doctor" && (
             <>
-              <input type="text" name="specialization" placeholder="Specialization" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <input type="text" name="qualifications" placeholder="Qualifications (comma-separated)" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <input type="number" name="experienceYears" placeholder="Years of Experience" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <input type="text" name="phone" placeholder="Phone" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <input type="text" name="gender" placeholder="Gender" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <textarea name="bio" placeholder="Bio" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+              <input
+                type="text"
+                name="specialization"
+                placeholder="Specialization"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                name="qualifications"
+                placeholder="Qualifications (comma-separated)"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="number"
+                name="experienceYears"
+                placeholder="Years of Experience"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                name="phone"
+                placeholder="Phone"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                name="gender"
+                placeholder="Gender"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <textarea
+                name="bio"
+                placeholder="Bio"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></textarea>
             </>
           )}
           {role === "patient" && (
             <>
-              <input type="number" name="age" placeholder="Age" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <input type="text" name="gender" placeholder="Gender" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <input type="text" name="phone" placeholder="Phone" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <input type="text" name="address" placeholder="Address" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <input type="text" name="bloodGroup" placeholder="Blood Group" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <input type="text" name="allergies" placeholder="Allergies (comma-separated)" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <h3 className="text-lg font-semibold text-gray-100">Emergency Contact</h3>
-              <input type="text" name="emergencyName" placeholder="Name" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <input type="text" name="emergencyPhone" placeholder="Phone" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <input type="text" name="emergencyRelation" placeholder="Relation" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                type="number"
+                name="age"
+                placeholder="Age"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                name="gender"
+                placeholder="Gender"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                name="phone"
+                placeholder="Phone"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                name="address"
+                placeholder="Address"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                name="bloodGroup"
+                placeholder="Blood Group"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                name="allergies"
+                placeholder="Allergies (comma-separated)"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <h3 className="text-lg font-semibold text-gray-100">
+                Emergency Contact
+              </h3>
+              <input
+                type="text"
+                name="emergencyName"
+                placeholder="Name"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                name="emergencyPhone"
+                placeholder="Phone"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                name="emergencyRelation"
+                placeholder="Relation"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </>
           )}
           {role === "pharmacist" && (
             <>
-              <input type="text" name="pharmacyName" placeholder="Pharmacy Name" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <input type="text" name="phone" placeholder="Phone" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <input type="text" name="licenseNumber" placeholder="License Number" className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                type="text"
+                name="pharmacyName"
+                placeholder="Pharmacy Name"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                name="phone"
+                placeholder="Phone"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                name="licenseNumber"
+                placeholder="License Number"
+                className="bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </>
           )}
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
             Submit
           </button>
         </form>

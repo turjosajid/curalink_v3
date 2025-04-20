@@ -4,7 +4,6 @@ import User from "../models/user.model.js";
 
 export const signup = async (req, res) => {
   try {
-
     const { name, email, password, role } = req.body;
     console.log("Received info:", req.body); // Debugging line to check received data
     const existingUser = await User.findOne({ email });
@@ -25,6 +24,7 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log("Login attempt with email:", email, password); // Debugging line to check received data
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -36,12 +36,21 @@ export const login = async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    }); 
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
 
-    res.status(200).json({ message: "Login successful", token, userId: user.id, firstlogin: user.firstlogin });
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      userId: user.id,
+      firstlogin: user.firstlogin,
+    });
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error!" });
   }
 };

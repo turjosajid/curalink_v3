@@ -41,7 +41,10 @@ export default function SignUp() {
             placeholder="Password"
             className="border px-4 py-2 rounded"
           />
-          <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+          >
             Sign Up
           </button>
         </form>

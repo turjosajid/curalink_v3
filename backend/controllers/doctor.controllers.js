@@ -4,8 +4,9 @@ import DoctorProfile from "../models/doctorprofile.model.js";
 // Get all appointments by doctor's user ID
 export const getAppointmentsByDoctor = async (req, res) => {
   try {
-    const appointments = await Appointment.find({ doctor: req.params.doctorId })
-    .populate("patient", "name email"); // Populate patient details;
+    const appointments = await Appointment.find({
+      doctor: req.params.doctorId,
+    }).populate("patient", "name email"); // Populate patient details;
     res.status(200).json(appointments);
   } catch (error) {
     res.status(500).json({ message: "Error fetching appointments", error });
@@ -65,7 +66,9 @@ export const editAppointment = async (req, res) => {
 // Get available slots by doctor's user ID
 export const getAvailableSlots = async (req, res) => {
   try {
-    const doctorProfile = await DoctorProfile.findOne({ user: req.params.doctorId });
+    const doctorProfile = await DoctorProfile.findOne({
+      user: req.params.doctorId,
+    });
     if (!doctorProfile) {
       return res.status(404).json({ message: "Doctor profile not found" });
     }
@@ -89,5 +92,23 @@ export const updateAvailableSlots = async (req, res) => {
     res.status(200).json(doctorProfile);
   } catch (error) {
     res.status(500).json({ message: "Error updating available slots", error });
+  }
+};
+
+// Get all completed appointments (past consultations) by doctor's user ID
+export const getPastConsultationsByDoctor = async (req, res) => {
+  try {
+    const pastConsultations = await Appointment.find({
+      doctor: req.params.doctorId,
+      status: "completed",
+    })
+      .populate("patient", "name email")
+      .sort({ date: -1 }); // Sort by date, most recent first
+    console.log("Past consultations:", pastConsultations); // Log for debugging
+    res.status(200).json(pastConsultations);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching past consultations", error });
   }
 };
