@@ -9,8 +9,9 @@ import {
   addDiagnosticReport,
   completeAppointment,
   getPatientCompletedAppointments,
+  getAppointmentById,
 } from "../controllers/appointment.controller.js";
-import { verifyToken, isDoctor } from "../middleware/auth.middleware.js";
+import { verifyToken, isDoctor, isPatient } from "../middleware/auth.middleware.js";
 import upload from "../utils/upload.js";
 
 const router = express.Router();
@@ -19,14 +20,18 @@ const router = express.Router();
 router.get("/doctor/:doctorId", verifyToken, isDoctor, getAppointments);
 
 // Get all appointments for a patient
-router.get("/patient/:patientId", verifyToken, getPatientAppointments);
+router.get("/patient/:patientId", verifyToken, isPatient, getPatientAppointments);
 
 // Get completed appointments for a patient
 router.get(
   "/patient/:patientId/completed",
   verifyToken,
+  isPatient,
   getPatientCompletedAppointments
 );
+
+// Get a single appointment by ID
+router.get("/:appointmentId", verifyToken, getAppointmentById);
 
 // Get detailed dashboard for a specific appointment
 router.get(

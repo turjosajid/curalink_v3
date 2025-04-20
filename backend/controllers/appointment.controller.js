@@ -304,6 +304,40 @@ const getPatientCompletedAppointments = async (req, res) => {
   }
 };
 
+// Get a single appointment by ID
+const getAppointmentById = async (req, res) => {
+  try {
+    const { appointmentId } = req.params;
+
+    const appointment = await Appointment.findById(appointmentId)
+      .populate("doctor", "name email")
+      .populate("patient", "name email")
+      .populate("prescription")
+      .populate("medicalRecord");
+
+    if (!appointment) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
+
+    // Check if the requesting user is authorized to view this appointment
+    // Either the patient or the doctor involved in the appointment
+    if (
+      req.user._id.toString() !== appointment.patient._id.toString() &&
+      req.user._id.toString() !== appointment.doctor._id.toString() &&
+      req.user.role !== "admin"
+    ) {
+      return res
+        .status(403)
+        .json({ error: "Not authorized to view this appointment" });
+    }
+
+    res.status(200).json(appointment);
+  } catch (error) {
+    console.error("Error fetching appointment:", error);
+    res.status(500).json({ error: "Failed to fetch appointment details" });
+  }
+};
+
 export {
   getAppointments,
   getPatientAppointments,
@@ -314,4 +348,5 @@ export {
   addDiagnosticReport,
   completeAppointment,
   getPatientCompletedAppointments,
+  getAppointmentById,
 };
