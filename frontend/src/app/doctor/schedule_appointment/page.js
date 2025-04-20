@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,11 +9,13 @@ import { Label } from "@/components/ui/label";
 
 export default function ScheduleAppointmentPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const patientId = searchParams.get("patientId"); // Get patientId from URL query parameters
   const [user, setUser] = useState(null);
   const [dpatients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
-    patient: "",
+    patient: patientId || "",
     date: "",
     reason: "",
   });
@@ -137,11 +139,11 @@ export default function ScheduleAppointmentPage() {
     const dayOfWeek = date.toLocaleString("en-US", { weekday: "long" });
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    
+
     // Ensure we're checking against slots that we actually offered in the dropdown
     // This is a more direct comparison to what we generated
-    return availableDateTimes.some(week => 
-      week.slots.some(slot => slot.dateTimeStr === dateTime)
+    return availableDateTimes.some((week) =>
+      week.slots.some((slot) => slot.dateTimeStr === dateTime)
     );
   };
 
@@ -169,21 +171,21 @@ export default function ScheduleAppointmentPage() {
 
     try {
       // Create appointment data with exact ISO string format from selected time slot
-      const appointmentData = { 
+      const appointmentData = {
         patient: formData.patient,
         date: formData.date, // This is already in ISO format from the dropdown
         reason: formData.reason,
         doctor: user,
-        status: "pending" // Using "pending" which is a valid enum value
+        status: "pending", // Using "pending" which is a valid enum value
       };
-      
+
       console.log("Sending appointment data:", appointmentData);
-      
+
       const response = await axios.post(
         "http://localhost:5000/api/doctors/appointments",
         appointmentData
       );
-      
+
       console.log("Appointment created:", response.data);
 
       // Show success message and reset form

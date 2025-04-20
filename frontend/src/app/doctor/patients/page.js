@@ -133,7 +133,7 @@ export default function DoctorPatientsPage() {
                 </Button>
                 <Button asChild size="sm">
                   <Link
-                    href={`/doctor/appointments/edit?patientId=${patient._id}`}
+                    href={`/doctor/schedule_appointment?patientId=${patient._id}`}
                   >
                     Schedule Appointment
                   </Link>
