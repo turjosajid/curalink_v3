@@ -17,6 +17,32 @@ const getAppointments = async (req, res) => {
   }
 };
 
+// Get all appointments for a patient
+const getPatientAppointments = async (req, res) => {
+  try {
+    const patientId = req.params.patientId;
+
+    // Verify that the requesting user is the same as the patient
+    if (req.user._id.toString() !== patientId) {
+      return res
+        .status(403)
+        .json({ error: "Not authorized to view these appointments" });
+    }
+
+    const appointments = await Appointment.find({
+      patient: patientId,
+    })
+      .populate("doctor", "name email")
+      .populate("prescription")
+      .sort({ date: -1 }); // Sort by date in descending order (newest first)
+
+    res.status(200).json(appointments);
+  } catch (error) {
+    console.error("Error fetching patient appointments:", error);
+    res.status(500).json({ error: "Failed to fetch appointments" });
+  }
+};
+
 // Get detailed information for a specific appointment
 const getAppointmentDashboard = async (req, res) => {
   try {
@@ -222,12 +248,41 @@ const completeAppointment = async (req, res) => {
   }
 };
 
+// Get all completed appointments for a patient
+const getPatientCompletedAppointments = async (req, res) => {
+  try {
+    const patientId = req.params.patientId;
+
+    // Verify that the requesting user is the same as the patient
+    if (req.user._id.toString() !== patientId) {
+      return res
+        .status(403)
+        .json({ error: "Not authorized to view these appointments" });
+    }
+
+    const appointments = await Appointment.find({
+      patient: patientId,
+      status: "completed",
+    })
+      .populate("doctor", "name email")
+      .populate("prescription")
+      .sort({ date: -1 }); // Sort by date in descending order (newest first)
+
+    res.status(200).json(appointments);
+  } catch (error) {
+    console.error("Error fetching patient completed appointments:", error);
+    res.status(500).json({ error: "Failed to fetch completed appointments" });
+  }
+};
+
 export {
   getAppointments,
+  getPatientAppointments,
   getAppointmentDashboard,
   updateAppointmentDiagnosis,
   addPrescription,
   updateMedicalRecord,
   addDiagnosticReport,
   completeAppointment,
+  getPatientCompletedAppointments,
 };

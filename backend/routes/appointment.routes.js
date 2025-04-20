@@ -1,12 +1,14 @@
 import express from "express";
 import {
   getAppointments,
+  getPatientAppointments,
   getAppointmentDashboard,
   updateAppointmentDiagnosis,
   addPrescription,
   updateMedicalRecord,
   addDiagnosticReport,
   completeAppointment,
+  getPatientCompletedAppointments,
 } from "../controllers/appointment.controller.js";
 import { verifyToken, isDoctor } from "../middleware/auth.middleware.js";
 
@@ -14,6 +16,16 @@ const router = express.Router();
 
 // Get all appointments for a doctor
 router.get("/doctor/:doctorId", verifyToken, isDoctor, getAppointments);
+
+// Get all appointments for a patient
+router.get("/patient/:patientId", verifyToken, getPatientAppointments);
+
+// Get completed appointments for a patient
+router.get(
+  "/patient/:patientId/completed",
+  verifyToken,
+  getPatientCompletedAppointments
+);
 
 // Get detailed dashboard for a specific appointment
 router.get(
