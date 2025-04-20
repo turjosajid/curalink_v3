@@ -31,6 +31,16 @@ export const getAppointmentById = async (req, res) => {
 // Create a new appointment
 export const createAppointment = async (req, res) => {
   try {
+    // Validate that appointment date is not in the past
+    const appointmentDate = new Date(req.body.date);
+    const currentDate = new Date();
+
+    if (appointmentDate <= currentDate) {
+      return res
+        .status(400)
+        .json({ error: "Appointment date and time must be in the future." });
+    }
+
     const newAppointment = new Appointment(req.body);
     const savedAppointment = await newAppointment.save();
     res.status(201).json(savedAppointment);
@@ -52,11 +62,26 @@ export const deleteAppointment = async (req, res) => {
 // Edit an appointment
 export const editAppointment = async (req, res) => {
   try {
+    // If date is being updated, validate it's not in the past
+    if (req.body.date) {
+      const appointmentDate = new Date(req.body.date);
+      const currentDate = new Date();
+
+      if (appointmentDate <= currentDate) {
+        return res
+          .status(400)
+          .json({ error: "Appointment date and time must be in the future." });
+      }
+    }
+
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       req.params.appointmentId,
       req.body,
       { new: true }
     );
+    if (!updatedAppointment) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
     res.status(200).json(updatedAppointment);
   } catch (error) {
     res.status(500).json({ message: "Error updating appointment", error });

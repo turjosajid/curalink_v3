@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Link from "next/link";
 
 const AppointmentsPage = () => {
   const [appointments, setAppointments] = useState([]);
@@ -12,6 +13,7 @@ const AppointmentsPage = () => {
     date: "",
     reason: "",
   }); // State for form data
+  const [formError, setFormError] = useState(""); // State for form error messages
   const [dpatients, setPatients] = useState([]); // State to store patients
   const router = useRouter();
 
@@ -66,6 +68,17 @@ const AppointmentsPage = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    setFormError("");
+
+    // Validate that appointment date is not in the past
+    const appointmentDate = new Date(formData.date);
+    const currentDate = new Date();
+
+    if (appointmentDate <= currentDate) {
+      setFormError("Appointment date and time must be in the future.");
+      return;
+    }
+
     try {
       const appointmentData = { ...formData, doctor: user }; // Add user ID as doctor
       await axios.post(
@@ -73,11 +86,16 @@ const AppointmentsPage = () => {
         appointmentData
       );
       setShowModal(false); // Close modal after submission
+      setFormData({ patient: "", date: "", reason: "" }); // Reset form
       alert("Appointment added successfully!");
       await fetchAppointments(); // Reload appointments after adding
     } catch (error) {
       console.error("Error adding appointment:", error);
-      alert("Failed to add appointment. Please try again.");
+      if (error.response && error.response.data && error.response.data.error) {
+        setFormError(error.response.data.error);
+      } else {
+        setFormError("Failed to add appointment. Please try again.");
+      }
     }
   };
 
@@ -128,35 +146,43 @@ const AppointmentsPage = () => {
                 </p>
                 <p className="text-gray-400">Reason: {appointment.reason}</p>
                 <p className="text-white-400">{appointment.status}</p>
-                <button
-                  onClick={() =>
-                    router.push(
-                      `/doctor/appointments/patientdetails?patientId=${
-                        appointment.patient?._id || ""
-                      }`
-                    )
-                  }
-                  className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                  disabled={!appointment.patient} // Disable button if patient is null
-                >
-                  Show Patient Details
-                </button>
-                <button
-                  onClick={() =>
-                    router.push(
-                      `/doctor/appointments/edit?appointmentId=${appointment._id}`
-                    )
-                  }
-                  className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                >
-                  Edit Appointment
-                </button>
-                <button
-                  onClick={() => handleDeleteAppointment(appointment._id)}
-                  className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                >
-                  Delete Appointment
-                </button>
+                <div className="flex flex-wrap mt-3 gap-2">
+                  <Link
+                    href={`/doctor/appointments/dashboard/${appointment._id}`}
+                    className="text-gray-900 bg-blue-400 border border-gray-300 focus:outline-none hover:bg-blue-500 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:text-white dark:border-gray-600 dark:hover:bg-blue-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                  >
+                    Open Dashboard
+                  </Link>
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/doctor/appointments/patientdetails?patientId=${
+                          appointment.patient?._id || ""
+                        }`
+                      )
+                    }
+                    className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                    disabled={!appointment.patient} // Disable button if patient is null
+                  >
+                    Show Patient Details
+                  </button>
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/doctor/appointments/edit?appointmentId=${appointment._id}`
+                      )
+                    }
+                    className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                  >
+                    Edit Appointment
+                  </button>
+                  <button
+                    onClick={() => handleDeleteAppointment(appointment._id)}
+                    className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                  >
+                    Delete Appointment
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
@@ -201,6 +227,7 @@ const AppointmentsPage = () => {
                 onChange={handleFormChange}
                 className="border px-4 py-2 rounded"
               />
+              {formError && <p className="text-red-500 text-sm">{formError}</p>}
               <div className="flex justify-end gap-2">
                 <button
                   type="button"

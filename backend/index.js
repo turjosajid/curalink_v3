@@ -8,6 +8,7 @@ import doctorProfileRoutes from "./routes/doctorprofile.routes.js";
 import doctorRoutes from "./routes/doctor.routes.js";
 import patientProfileRoutes from "./routes/patientprofile.routes.js";
 import pharmacistProfileRoutes from "./routes/pharmacistprofile.routes.js";
+import appointmentRoutes from "./routes/appointment.routes.js";
 dotenv.config();
 
 const app = express();
@@ -37,3 +38,4 @@ app.use("/api/doctor-profiles", doctorProfileRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/patient-profiles", patientProfileRoutes);
 app.use("/api/pharmacist-profiles", pharmacistProfileRoutes);
+app.use("/api/appointments", appointmentRoutes);

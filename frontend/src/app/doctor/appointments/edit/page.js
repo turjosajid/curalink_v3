@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 const EditAppointmentPage = () => {
   const router = useRouter();
   const searchparams = useSearchParams();
-  const appointmentId = searchparams.get('appointmentId'); // Safely access appointmentId
+  const appointmentId = searchparams.get("appointmentId"); // Safely access appointmentId
   console.log("Appointment ID:", appointmentId); // Debugging line
 
   const [formData, setFormData] = useState({
@@ -15,16 +15,21 @@ const EditAppointmentPage = () => {
     reason: "",
     status: "",
   });
- 
+  const [formError, setFormError] = useState("");
+
   useEffect(() => {
     if (!appointmentId) return; // Ensure appointmentId is defined
     // Fetch existing appointment data
     axios
-      .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/doctors/appointments/${appointmentId}`)
+      .get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/doctors/appointments/${appointmentId}`
+      )
       .then((response) => {
         const appointmentData = response.data;
         // Format the date to "yyyy-MM-ddThh:mm"
-        const formattedDate = new Date(appointmentData.date).toISOString().slice(0, 16);
+        const formattedDate = new Date(appointmentData.date)
+          .toISOString()
+          .slice(0, 16);
         setFormData({ ...appointmentData, date: formattedDate });
       })
       .catch((error) => {
@@ -39,22 +44,47 @@ const EditAppointmentPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setFormError("");
+
+    // Validate that appointment date is not in the past
+    const appointmentDate = new Date(formData.date);
+    const currentDate = new Date();
+
+    if (appointmentDate <= currentDate && formData.status !== "completed") {
+      setFormError("Appointment date and time must be in the future.");
+      return;
+    }
+
     // Update appointment data
     axios
-      .put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/doctors/appointments/${appointmentId}`, formData)
+      .put(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/doctors/appointments/${appointmentId}`,
+        formData
+      )
       .then(() => {
         alert("Appointment updated successfully!");
         router.push("/doctor/appointments");
       })
       .catch((error) => {
         console.error("Error updating appointment:", error);
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.error
+        ) {
+          setFormError(error.response.data.error);
+        } else {
+          setFormError("Failed to update appointment. Please try again.");
+        }
       });
   };
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 p-6">
       <div className="max-w-4xl mx-auto bg-gray-800 shadow-lg rounded-lg p-6">
-        <h1 className="text-3xl font-bold text-gray-100 mb-6 text-center">Edit Appointment</h1>
+        <h1 className="text-3xl font-bold text-gray-100 mb-6 text-center">
+          Edit Appointment
+        </h1>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="block text-gray-200 mb-2">Date:</label>
@@ -91,6 +121,9 @@ const EditAppointmentPage = () => {
               <option value="completed">Completed</option>
             </select>
           </div>
+          {formError && (
+            <div className="text-red-500 font-medium mt-2">{formError}</div>
+          )}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
