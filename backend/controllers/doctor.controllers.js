@@ -31,8 +31,11 @@ export const getAppointmentById = async (req, res) => {
 // Create a new appointment
 export const createAppointment = async (req, res) => {
   try {
+    // Get the appointment data from the request body
+    const appointmentData = { ...req.body };
+    
     // Validate that appointment date is not in the past
-    const appointmentDate = new Date(req.body.date);
+    const appointmentDate = new Date(appointmentData.date);
     const currentDate = new Date();
 
     if (appointmentDate <= currentDate) {
@@ -41,11 +44,18 @@ export const createAppointment = async (req, res) => {
         .json({ error: "Appointment date and time must be in the future." });
     }
 
-    const newAppointment = new Appointment(req.body);
+    // Make sure the date is properly preserved as an ISO string
+    // This prevents any timezone conversion issues
+    appointmentData.date = appointmentDate.toISOString();
+
+    const newAppointment = new Appointment(appointmentData);
     const savedAppointment = await newAppointment.save();
+    
+    // Return the appointment with the correct date format
     res.status(201).json(savedAppointment);
   } catch (error) {
-    res.status(500).json({ message: "Error creating appointment", error });
+    console.error("Error creating appointment:", error);
+    res.status(500).json({ message: "Error creating appointment", error: error.message });
   }
 };
 
@@ -62,9 +72,11 @@ export const deleteAppointment = async (req, res) => {
 // Edit an appointment
 export const editAppointment = async (req, res) => {
   try {
+    const appointmentData = { ...req.body };
+    
     // If date is being updated, validate it's not in the past
-    if (req.body.date) {
-      const appointmentDate = new Date(req.body.date);
+    if (appointmentData.date) {
+      const appointmentDate = new Date(appointmentData.date);
       const currentDate = new Date();
 
       if (appointmentDate <= currentDate) {
@@ -72,19 +84,25 @@ export const editAppointment = async (req, res) => {
           .status(400)
           .json({ error: "Appointment date and time must be in the future." });
       }
+      
+      // Ensure date is stored in consistent ISO format
+      appointmentData.date = appointmentDate.toISOString();
     }
 
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       req.params.appointmentId,
-      req.body,
+      appointmentData,
       { new: true }
     );
+    
     if (!updatedAppointment) {
       return res.status(404).json({ error: "Appointment not found" });
     }
+    
     res.status(200).json(updatedAppointment);
   } catch (error) {
-    res.status(500).json({ message: "Error updating appointment", error });
+    console.error("Error updating appointment:", error);
+    res.status(500).json({ message: "Error updating appointment", error: error.message });
   }
 };
 
