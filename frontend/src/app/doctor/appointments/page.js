@@ -7,14 +7,6 @@ import Link from "next/link";
 const AppointmentsPage = () => {
   const [appointments, setAppointments] = useState([]);
   const [user, setUser] = useState(null);
-  const [showModal, setShowModal] = useState(false); // State to control modal visibility
-  const [formData, setFormData] = useState({
-    patient: "",
-    date: "",
-    reason: "",
-  }); // State for form data
-  const [formError, setFormError] = useState(""); // State for form error messages
-  const [dpatients, setPatients] = useState([]); // State to store patients
   const router = useRouter();
 
   const fetchAppointments = async () => {
@@ -46,59 +38,6 @@ const AppointmentsPage = () => {
     }
   }, [user]); // Removed `appointments` from the dependency array
 
-  useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/api/patient-profiles"
-        ); // Fetch patients from API
-        console.log("Fetched patients:", response.data); // Debugging line to check fetched data
-        setPatients(response.data);
-      } catch (error) {
-        console.error("Error fetching patients:", error);
-      }
-    };
-
-    fetchPatients();
-  }, []);
-
-  const handleFormChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    setFormError("");
-
-    // Validate that appointment date is not in the past
-    const appointmentDate = new Date(formData.date);
-    const currentDate = new Date();
-
-    if (appointmentDate <= currentDate) {
-      setFormError("Appointment date and time must be in the future.");
-      return;
-    }
-
-    try {
-      const appointmentData = { ...formData, doctor: user }; // Add user ID as doctor
-      await axios.post(
-        "http://localhost:5000/api/doctors/appointments",
-        appointmentData
-      );
-      setShowModal(false); // Close modal after submission
-      setFormData({ patient: "", date: "", reason: "" }); // Reset form
-      alert("Appointment added successfully!");
-      await fetchAppointments(); // Reload appointments after adding
-    } catch (error) {
-      console.error("Error adding appointment:", error);
-      if (error.response && error.response.data && error.response.data.error) {
-        setFormError(error.response.data.error);
-      } else {
-        setFormError("Failed to add appointment. Please try again.");
-      }
-    }
-  };
-
   const handleDeleteAppointment = async (appointmentId) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this appointment?"
@@ -122,13 +61,10 @@ const AppointmentsPage = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 p-6">
       <div className="max-w-4xl mx-auto bg-gray-800 shadow-lg rounded-lg p-6">
-        <h1 className="text-3xl font-bold text-gray-100 mb-4">Appointments</h1>
-        <button
-          onClick={() => setShowModal(true)}
-          className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-        >
-          Add Appointment
-        </button>
+        <h1 className="text-3xl font-bold text-gray-100 mb-4">
+          {" "}
+          Upcoming Appointments
+        </h1>
         {appointments.length === 0 ? (
           <p className="text-center text-gray-400">No appointments found.</p>
         ) : (
@@ -188,65 +124,6 @@ const AppointmentsPage = () => {
           </ul>
         )}
       </div>
-
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 className="text-2xl font-bold text-gray-100 mb-4">
-              Add Appointment
-            </h2>
-            <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
-              <select
-                name="patient"
-                value={formData.patient}
-                onChange={handleFormChange}
-                className="border px-4 py-2 rounded"
-                required
-              >
-                <option value="" disabled>
-                  Select a patient
-                </option>
-                {dpatients.map((patient) => (
-                  <option key={patient.user._id} value={patient.user._id}>
-                    {patient.user.name} - {patient.user.email}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="datetime-local"
-                name="date"
-                value={formData.date}
-                onChange={handleFormChange}
-                className="border px-4 py-2 rounded"
-                required
-              />
-              <textarea
-                name="reason"
-                placeholder="Reason"
-                value={formData.reason}
-                onChange={handleFormChange}
-                className="border px-4 py-2 rounded"
-              />
-              {formError && <p className="text-red-500 text-sm">{formError}</p>}
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                  Submit
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
