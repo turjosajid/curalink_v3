@@ -9,6 +9,7 @@ import {
   addDiagnosticReport,
   completeAppointment,
   getPatientCompletedAppointments,
+  getPatientAppointmentDetails,
 } from "../controllers/appointment.controller.js";
 import { verifyToken, isDoctor } from "../middleware/auth.middleware.js";
 import upload from "../utils/upload.js";
@@ -28,12 +29,19 @@ router.get(
   getPatientCompletedAppointments
 );
 
-// Get detailed dashboard for a specific appointment
+// Get detailed dashboard for a specific appointment (doctor view)
 router.get(
   "/:appointmentId/dashboard",
   verifyToken,
   isDoctor,
   getAppointmentDashboard
+);
+
+// Get appointment details for a patient
+router.get(
+  "/patient/appointment/:appointmentId",
+  verifyToken,
+  getPatientAppointmentDetails
 );
 
 // Update appointment with diagnosis and notes

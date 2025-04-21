@@ -3,11 +3,16 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function PatientPastAppointmentsPage() {
   const [pastAppointments, setPastAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedPrescription, setSelectedPrescription] = useState(null);
+  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchPastAppointments = async () => {
@@ -47,6 +52,93 @@ export default function PatientPastAppointmentsPage() {
 
     fetchPastAppointments();
   }, []);
+
+  const handleViewPrescription = (prescription) => {
+    setSelectedPrescription(prescription);
+    setShowPrescriptionModal(true);
+  };
+
+  const handleViewDetails = (appointmentId) => {
+    // Navigate to a detailed view of the appointment
+    router.push(`/patient/appointments/${appointmentId}`);
+  };
+
+  // Modal for viewing prescription
+  const PrescriptionModal = ({ prescription, onClose }) => {
+    if (!prescription) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">Prescription Details</h3>
+              <button
+                onClick={onClose}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <h4 className="font-semibold text-lg mb-2">Medications</h4>
+              {prescription.medications &&
+              prescription.medications.length > 0 ? (
+                <div className="space-y-3">
+                  {prescription.medications.map((med, index) => (
+                    <div key={index} className="border p-3 rounded-md">
+                      <p className="font-medium">{med.name}</p>
+                      <p className="text-sm text-gray-600">
+                        Dosage: {med.dosage}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Frequency: {med.frequency}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Duration: {med.duration}
+                      </p>
+                      {med.instructions && (
+                        <p className="text-sm text-gray-600">
+                          Instructions: {med.instructions}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500">No medications prescribed</p>
+              )}
+            </div>
+
+            {prescription.notes && (
+              <div>
+                <h4 className="font-semibold text-lg mb-2">Notes</h4>
+                <p className="text-gray-700">{prescription.notes}</p>
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end">
+              <Button onClick={onClose}>Close</Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
@@ -126,16 +218,32 @@ export default function PatientPastAppointmentsPage() {
 
                 <div className="mt-6 flex justify-end">
                   {appointment.prescription && (
-                    <Button variant="outline" className="mr-2">
+                    <Button
+                      variant="outline"
+                      className="mr-2"
+                      onClick={() =>
+                        handleViewPrescription(appointment.prescription)
+                      }
+                    >
                       View Prescription
                     </Button>
                   )}
-                  <Button>View Details</Button>
+                  <Button onClick={() => handleViewDetails(appointment._id)}>
+                    View Details
+                  </Button>
                 </div>
               </div>
             </Card>
           ))}
         </div>
+      )}
+
+      {/* Render prescription modal when a prescription is selected */}
+      {showPrescriptionModal && (
+        <PrescriptionModal
+          prescription={selectedPrescription}
+          onClose={() => setShowPrescriptionModal(false)}
+        />
       )}
     </div>
   );

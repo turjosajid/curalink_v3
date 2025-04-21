@@ -304,6 +304,35 @@ const getPatientCompletedAppointments = async (req, res) => {
   }
 };
 
+// Add a new controller function for patients to view their appointment details
+const getPatientAppointmentDetails = async (req, res) => {
+  try {
+    const { appointmentId } = req.params;
+
+    const appointment = await Appointment.findById(appointmentId)
+      .populate("patient", "name email")
+      .populate("doctor", "name email")
+      .populate("prescription")
+      .populate("medicalRecord");
+
+    if (!appointment) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
+
+    // Verify that the requesting user is the patient associated with this appointment
+    if (appointment.patient._id.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ error: "Not authorized to view this appointment" });
+    }
+
+    res.status(200).json(appointment);
+  } catch (error) {
+    console.error("Error fetching patient appointment details:", error);
+    res.status(500).json({ error: "Failed to fetch appointment details" });
+  }
+};
+
 export {
   getAppointments,
   getPatientAppointments,
@@ -314,4 +343,5 @@ export {
   addDiagnosticReport,
   completeAppointment,
   getPatientCompletedAppointments,
+  getPatientAppointmentDetails,
 };
