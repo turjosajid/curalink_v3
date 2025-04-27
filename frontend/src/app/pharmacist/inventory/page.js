@@ -14,6 +14,8 @@ const InventoryPage = () => {
     });
     const [editingData, setEditingData] = useState(null); // Track the item being edited
     const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Track modal visibility
+    const [showAlertsOnly, setShowAlertsOnly] = useState(false); // Filter toggle for alerts
+    const [searchQuery, setSearchQuery] = useState(""); // Search query state
 
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -105,107 +107,168 @@ const InventoryPage = () => {
         }
     };
 
+    const isLowStock = (quantity) => quantity < 10; // Define low stock threshold
+    const isNearingExpiration = (expirationDate) => {
+        const today = new Date();
+        const expiration = new Date(expirationDate);
+        const diffInDays = (expiration - today) / (1000 * 60 * 60 * 24);
+        return diffInDays <= 30; // Define nearing expiration threshold (30 days)
+    };
+
+    const filteredInventory = inventory
+        .filter((item) =>
+            item.medicationName.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .filter((item) =>
+            showAlertsOnly
+                ? isLowStock(item.quantity) || isNearingExpiration(item.expirationDate)
+                : true
+        );
+
     if (loading) {
         return <div className="text-center text-lg text-gray-500 mt-10">Loading...</div>;
     }
 
     return (
-        <div suppressHydrationWarning className="max-w-4xl mx-auto p-6 bg-gray-100 rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Pharmacist Inventory</h1>
-            <form className="bg-white p-6 rounded-lg shadow-md mb-6" onSubmit={handleAddSubmit}>
-                <h2 className="text-xl font-bold text-gray-700 mb-4">Add Medicine</h2>
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2">Medication Name:</label>
-                    <input
-                        type="text"
-                        name="medicationName"
-                        value={formData.medicationName}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2">Batch Number:</label>
-                    <input
-                        type="text"
-                        name="batchNumber"
-                        value={formData.batchNumber}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2">Expiration Date:</label>
-                    <input
-                        type="date"
-                        name="expirationDate"
-                        value={formData.expirationDate}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2">Quantity:</label>
-                    <input
-                        type="number"
-                        name="quantity"
-                        value={formData.quantity}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
-                </div>
-                <button
-                    type="submit"
-                    className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
+        <div className="max-w-7xl mx-auto p-8 bg-gray-50 rounded-lg shadow-lg">
+            <h1 className="text-3xl font-extrabold text-center text-gray-800 mb-8">Pharmacist Inventory</h1>
+            <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+                <input          // Search input for filtering medicines     // Search bar
+                    type="text"
+                    placeholder="Search Medicine..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 md:mb-0"
+                />
+                <button          //show alerts only button/show all medicines button
+                    className={`px-4 py-2 rounded-lg font-medium ${
+                        showAlertsOnly
+                            ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                            : "bg-red-100 text-red-600 hover:bg-red-200"
+                    } transition duration-200`}
+                    onClick={() => setShowAlertsOnly(!showAlertsOnly)}
                 >
-                    Add Medicine
+                    {showAlertsOnly ? "Show All Medicines" : "Show Alerts Only"}
                 </button>
-            </form>
-            <table className="w-full bg-white rounded-lg shadow-md overflow-hidden">
-                <thead className="bg-gray-200">
-                    <tr>
-                        <th className="px-4 py-2 text-left text-gray-700 font-medium">Medication Name</th>
-                        <th className="px-4 py-2 text-left text-gray-700 font-medium">Batch Number</th>
-                        <th className="px-4 py-2 text-left text-gray-700 font-medium">Expiration Date</th>
-                        <th className="px-4 py-2 text-left text-gray-700 font-medium">Quantity</th>
-                        <th className="px-4 py-2 text-left text-gray-700 font-medium">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {inventory.map((item) => (
-                        <tr key={item._id} className="border-t">
-                            <td className="px-4 py-2">{item.medicationName}</td>
-                            <td className="px-4 py-2">{item.batchNumber}</td>
-                            <td className="px-4 py-2">{new Date(item.expirationDate).toLocaleDateString()}</td>
-                            <td className="px-4 py-2">{item.quantity}</td>
-                            <td className="px-4 py-2">
-                                <button
-                                    className="bg-yellow-400 text-white px-3 py-1 rounded-lg mr-2 hover:bg-yellow-500 transition duration-200"
-                                    onClick={() => handleEditClick(item)}
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition duration-200"
-                                    onClick={() => handleDeleteClick(item._id)}
-                                >
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            </div>
+            <div className="flex flex-col md:flex-row gap-8">
+                {/* Add Medicine Form */}
+                <form className="flex-1 bg-white p-8 rounded-lg shadow-md" onSubmit={handleAddSubmit}>
+                    <h2 className="text-2xl font-semibold text-gray-700 mb-6">Add Medicine</h2>
+                    <div className="grid grid-cols-1 gap-6">
+                        <div>
+                            <label className="block text-gray-600 font-medium mb-2">Medication Name:</label>
+                            <input
+                                type="text"
+                                name="medicationName"
+                                value={formData.medicationName}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-600 font-medium mb-2">Batch Number:</label>
+                            <input
+                                type="text"
+                                name="batchNumber"
+                                value={formData.batchNumber}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-600 font-medium mb-2">Expiration Date:</label>
+                            <input
+                                type="date"
+                                name="expirationDate"
+                                value={formData.expirationDate}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-600 font-medium mb-2">Quantity:</label>
+                            <input
+                                type="number"
+                                name="quantity"
+                                value={formData.quantity}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                            />
+                        </div>
+                    </div>
+                    <button
+                        type="submit"
+                        className="mt-6 w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200"
+                    >
+                        Add Medicine
+                    </button>
+                </form>
+
+                {/* Medicine List */}
+                <div className="flex-1 bg-white p-8 rounded-lg shadow-md">
+                    <h2 className="text-2xl font-semibold text-gray-700 mb-6">Medicine List</h2>
+                    <div className="overflow-x-auto">
+                        <table className="w-full bg-white rounded-lg shadow-md">
+                            <thead className="bg-gray-200">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-gray-700 font-semibold">Medication Name</th>
+                                    <th className="px-6 py-3 text-left text-gray-700 font-semibold">Batch Number</th>
+                                    <th className="px-6 py-3 text-left text-gray-700 font-semibold">Expiration Date</th>
+                                    <th className="px-6 py-3 text-left text-gray-700 font-semibold">Quantity</th>
+                                    <th className="px-6 py-3 text-left text-gray-700 font-semibold">Alerts</th>
+                                    <th className="px-6 py-3 text-left text-gray-700 font-semibold">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredInventory.map((item) => (
+                                    <tr key={item._id} className="border-t hover:bg-gray-100 transition duration-200">
+                                        <td className="px-6 py-4">{item.medicationName}</td>
+                                        <td className="px-6 py-4">{item.batchNumber}</td>
+                                        <td className="px-6 py-4">{new Date(item.expirationDate).toLocaleDateString()}</td>
+                                        <td className="px-6 py-4">{item.quantity}</td>
+                                        <td className="px-6 py-4">
+                                            {isLowStock(item.quantity) && isNearingExpiration(item.expirationDate) ? (
+                                                <span className="text-red-500 font-bold">
+                                                    Low Stock & Nearing Expiration
+                                                </span>
+                                            ) : isLowStock(item.quantity) ? (
+                                                <span className="text-red-500 font-bold">Low Stock</span>
+                                            ) : isNearingExpiration(item.expirationDate) ? (
+                                                <span className="text-red-500 font-bold">Nearing Expiration</span>
+                                            ) : null}
+                                        </td>
+                                        <td className="px-6 py-4 flex space-x-2">
+                                            <button
+                                                className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200"
+                                                onClick={() => handleEditClick(item)}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 transition duration-200"
+                                                onClick={() => handleDeleteClick(item._id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
             {/* Edit Modal */}
             {isEditModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                        <h2 className="text-xl font-bold text-gray-700 mb-4">Edit Medicine</h2>
+                    <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+                        <h2 className="text-2xl font-bold text-gray-700 mb-6">Edit Medicine</h2>
                         <form onSubmit={handleEditSubmit}>
                             <div className="mb-4">
                                 <label className="block text-gray-700 font-medium mb-2">Medication Name:</label>
