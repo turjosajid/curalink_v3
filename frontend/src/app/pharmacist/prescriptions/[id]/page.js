@@ -4,14 +4,19 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function PrescriptionDetails({ params }) {
   const [prescription, setPrescription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { id } = params;
+
+  // Check if we're coming from a patient detail page
+  const fromPatient = searchParams.get("fromPatient");
+  const patientId = searchParams.get("patientId");
 
   // Get API URL from environment variable with fallback
   const API_URL =
@@ -62,9 +67,13 @@ export default function PrescriptionDetails({ params }) {
     });
   };
 
-  // Go back to prescriptions list
+  // Update back button to return to the correct page
   const handleBackClick = () => {
-    router.push("/pharmacist/prescriptions");
+    if (fromPatient && patientId) {
+      router.push(`/pharmacist/patients/${patientId}`);
+    } else {
+      router.push("/pharmacist/prescriptions");
+    }
   };
 
   if (loading) {
