@@ -109,9 +109,12 @@ const InventoryPage = () => {
 
     const isLowStock = (quantity) => quantity < 10; // Define low stock threshold
     const isNearingExpiration = (expirationDate) => {
+        // Get dates without time components to ensure consistent comparison
         const today = new Date();
+        today.setHours(0, 0, 0, 0);
         const expiration = new Date(expirationDate);
-        const diffInDays = (expiration - today) / (1000 * 60 * 60 * 24);
+        expiration.setHours(0, 0, 0, 0);
+        const diffInDays = Math.floor((expiration - today) / (1000 * 60 * 60 * 24));
         return diffInDays <= 30; // Define nearing expiration threshold (30 days)
     };
 
