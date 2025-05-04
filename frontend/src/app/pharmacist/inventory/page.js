@@ -56,6 +56,7 @@ const InventoryPage = () => {
                 batchNumber: "",
                 expirationDate: "",
                 quantity: "",
+                
             });
         } catch (error) {
             console.error("Error adding medicine:", error);

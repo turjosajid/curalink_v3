@@ -102,17 +102,25 @@ export default function PatientAppointments() {
       </div>
     );
   }
-
+// appointment page myappoint e click then pathient book-appoint page go
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Appointments</h1>
-        <Button
-          onClick={() => router.push("/patient/past_appointments")}
-          variant="outline"
-        >
-          View Past Appointments
-        </Button>
+        <h1 className="text-2xl font-bold">My Appointments</h1>  
+        <div className="flex gap-2">
+          <Button
+            onClick={() => router.push("/patient/book-appointment")}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            Book Appointment
+          </Button>
+          <Button
+            onClick={() => router.push("/patient/past_appointments")}
+            variant="outline"
+          >
+            View Past Appointments
+          </Button>
+        </div>
       </div>
 
       {appointments.length === 0 ? (
@@ -123,7 +131,6 @@ export default function PatientAppointments() {
           <Button
             className="mt-4"
             onClick={() => {
-              // Navigate to appointment booking page (assuming it exists)
               router.push("/patient/book-appointment");
             }}
           >

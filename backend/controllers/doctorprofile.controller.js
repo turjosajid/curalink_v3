@@ -15,7 +15,6 @@ export const createDoctorProfile = async (req, res) => {
 export const updateDoctorProfile = async (req, res) => {
   try {
     updates = req.body;
-    
 
     const updatedProfile = await DoctorProfile.findOneAndUpdate(
       { user: req.params.id },
@@ -44,3 +43,16 @@ export const getDoctorProfileById = async (req, res) => {
   }
 };
 
+// Get all doctor profiles
+export const getAllDoctorProfiles = async (req, res) => {
+  try {
+    const doctors = await DoctorProfile.find()
+      .populate('user', 'name email')
+      .select('specialization experienceYears weeklyRecurringSlots');
+    res.status(200).json(doctors);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+//for appointment booking, all doctors getting
