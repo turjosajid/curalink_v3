@@ -9,10 +9,14 @@ const AvailabilityPage = () => {
     startTime: "09:00",
     endTime: "10:00",
   });
-
-  const userId = localStorage.getItem("userId");
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
+    setUserId(localStorage.getItem("userId"));
+  }, []);
+
+  useEffect(() => {
+    if (!userId) return;
     const fetchAvailableSlots = async () => {
       try {
         const response = await axios.get(
@@ -66,6 +70,14 @@ const AvailabilityPage = () => {
       [name]: value,
     });
   };
+
+  if (!userId) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-gray-200 flex items-center justify-center p-6">
+        <p className="text-gray-300">Loading availability...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 flex flex-col items-center justify-center p-6">
