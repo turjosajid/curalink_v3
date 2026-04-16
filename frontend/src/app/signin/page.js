@@ -1,9 +1,10 @@
 "use client";
+import React, { Suspense } from "react";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LoginForm } from "@/components/login-form"; // Adjust the import path as necessary
 
-export default function SignIn() {
+const SignInContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
@@ -63,5 +64,21 @@ export default function SignIn() {
         </form>
       </div>
     </div>
+  );
+};
+
+export default function SignIn() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-900 text-gray-200 flex items-center justify-center p-6">
+          <div className="bg-gray-800 shadow-lg rounded-lg p-6 w-full max-w-md">
+            <p className="text-center text-gray-300">Loading sign-in...</p>
+          </div>
+        </div>
+      }
+    >
+      <SignInContent />
+    </Suspense>
   );
 }
