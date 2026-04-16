@@ -1,10 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 
-const EditAppointmentPage = () => {
+const EditAppointmentForm = () => {
   const router = useRouter();
   const searchparams = useSearchParams();
   const appointmentId = searchparams.get("appointmentId"); // Safely access appointmentId
@@ -133,6 +133,22 @@ const EditAppointmentPage = () => {
         </form>
       </div>
     </div>
+  );
+};
+
+const EditAppointmentPage = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-900 text-gray-200 p-6">
+          <div className="max-w-4xl mx-auto bg-gray-800 shadow-lg rounded-lg p-6">
+            <p className="text-center text-gray-300">Loading appointment...</p>
+          </div>
+        </div>
+      }
+    >
+      <EditAppointmentForm />
+    </Suspense>
   );
 };
 
