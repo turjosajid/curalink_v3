@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import axios from "axios";
 
-const PatientDetailsPage = () => {
+const PatientDetailsContent = () => {
     const [patientDetails, setPatientDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const searchParams = useSearchParams();
@@ -116,6 +116,20 @@ const PatientDetailsPage = () => {
                 </div>
             </div>
         </div>
+    );
+};
+
+const PatientDetailsPage = () => {
+    return (
+        <Suspense
+            fallback={
+                <div className="min-h-screen bg-gray-900 text-gray-400 flex items-center justify-center text-lg font-medium">
+                    Loading...
+                </div>
+            }
+        >
+            <PatientDetailsContent />
+        </Suspense>
     );
 };
 
