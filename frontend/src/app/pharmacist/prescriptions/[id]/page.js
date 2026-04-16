@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function PrescriptionDetails({ params }) {
+const PrescriptionDetailsContent = ({ params }) => {
   const [prescription, setPrescription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -206,5 +206,19 @@ export default function PrescriptionDetails({ params }) {
         </Card>
       </div>
     </div>
+  );
+};
+
+export default function PrescriptionDetails(props) {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto p-4">
+          <div className="text-center py-8">Loading prescription...</div>
+        </div>
+      }
+    >
+      <PrescriptionDetailsContent {...props} />
+    </Suspense>
   );
 }
