@@ -13,6 +13,7 @@ export default function AppointmentDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const appointmentId = params.appointmentId;
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
   console.log("Appointment ID:", appointmentId);
 
   useEffect(() => {
@@ -26,14 +27,12 @@ export default function AppointmentDetailsPage() {
 
         // Fetch appointment details using the new patient-specific endpoint
         const response = await axios.get(
-          `${
-            process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
-          }/api/appointments/patient/appointment/${appointmentId}`,
+          `${API_URL}/api/appointments/patient/appointment/${appointmentId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         setAppointment(response.data);
