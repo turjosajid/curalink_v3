@@ -25,11 +25,11 @@ export default function BookAppointmentPage() {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await axios.get(
-          `${backendUrl}/api/doctor-profiles`
-        );
-        const doctorsWithSlots = response.data.filter(doctor => 
-          doctor.weeklyRecurringSlots && doctor.weeklyRecurringSlots.length > 0
+        const response = await axios.get(`${backendUrl}/api/doctor-profiles`);
+        const doctorsWithSlots = response.data.filter(
+          (doctor) =>
+            doctor.weeklyRecurringSlots &&
+            doctor.weeklyRecurringSlots.length > 0,
         );
         setDoctors(doctorsWithSlots);
         setLoading(false);
@@ -52,9 +52,11 @@ export default function BookAppointmentPage() {
   const fetchAvailableSlots = async (doctorId) => {
     try {
       const response = await axios.get(
-        `${backendUrl}/api/doctors/${doctorId}/available-slots`
+        `${backendUrl}/api/doctors/${doctorId}/available-slots`,
       );
-      const slots = generateAvailableDateTimes(response.data.weeklyRecurringSlots || []);
+      const slots = generateAvailableDateTimes(
+        response.data.weeklyRecurringSlots || [],
+      );
       setAvailableSlots(slots);
     } catch (error) {
       console.error("Error fetching available slots:", error);
@@ -78,9 +80,9 @@ export default function BookAppointmentPage() {
       const date = new Date(weekStart);
       date.setDate(weekStart.getDate() + dayOffset);
       const dayOfWeek = date.toLocaleString("en-US", { weekday: "long" });
-      
+
       const daySlots = weeklySlots.filter((slot) => slot.day === dayOfWeek);
-      
+
       daySlots.forEach((slot) => {
         const [startHour, startMinute] = slot.startTime.split(":").map(Number);
         const slotDate = new Date(date);
@@ -130,14 +132,14 @@ export default function BookAppointmentPage() {
       };
 
       await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"}/api/doctors/appointments`,
+        `${backendUrl}/api/doctors/appointments`,
         appointmentData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       setFormSuccess(true);
@@ -161,7 +163,9 @@ export default function BookAppointmentPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Book an Appointment</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">
+          Book an Appointment
+        </h1>
 
         {formSuccess && (
           <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
@@ -190,7 +194,8 @@ export default function BookAppointmentPage() {
                 <option value="">Choose a doctor</option>
                 {doctors.map((doctor) => (
                   <option key={doctor._id} value={doctor.user._id}>
-                    Dr. {doctor.user.name} - {doctor.specialization} ({doctor.experienceYears} years exp.)
+                    Dr. {doctor.user.name} - {doctor.specialization} (
+                    {doctor.experienceYears} years exp.)
                   </option>
                 ))}
               </select>
