@@ -17,8 +17,8 @@ const SignInContent = () => {
     try {
       console.log("Attempting to log in with:", { email, password }); // Debugging line to check input values
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        { email, password }
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
+        { email, password },
       );
       const data = response.data;
       console.log("Login response:", data); // Debugging line to check received data
@@ -30,7 +30,7 @@ const SignInContent = () => {
       console.error("Authentication error:", err.response?.data || err); // Log error details
       alert(
         err.response?.data?.error ||
-          "Authentication failed. Please check your credentials and try again."
+          "Authentication failed. Please check your credentials and try again.",
       );
     }
   };
