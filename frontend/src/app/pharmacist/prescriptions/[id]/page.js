@@ -19,8 +19,7 @@ const PrescriptionDetailsContent = ({ params }) => {
   const patientId = searchParams.get("patientId");
 
   // Get API URL from environment variable with fallback
-  const API_URL =
-    process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   // Fetch prescription details
   useEffect(() => {
@@ -40,7 +39,7 @@ const PrescriptionDetailsContent = ({ params }) => {
       } catch (err) {
         console.error("Error fetching prescription details:", err);
         setError(
-          "Failed to load prescription details. Please try again later."
+          "Failed to load prescription details. Please try again later.",
         );
       } finally {
         setLoading(false);
@@ -49,8 +48,8 @@ const PrescriptionDetailsContent = ({ params }) => {
 
     if (id) {
       console.log(
-        "Environment variable NEXT_PUBLIC_API_URL:",
-        process.env.NEXT_PUBLIC_API_URL
+        "Environment variable NEXT_PUBLIC_BACKEND_URL:",
+        process.env.NEXT_PUBLIC_BACKEND_URL,
       );
       fetchPrescriptionDetails();
     }
