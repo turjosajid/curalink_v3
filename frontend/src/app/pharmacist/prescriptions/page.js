@@ -15,8 +15,7 @@ export default function PharmacistPrescriptions() {
   const router = useRouter();
 
   // Get API URL from environment variable with fallback
-  const API_URL =
-    process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   // Fetch all prescriptions
   const fetchPrescriptions = async () => {
@@ -56,7 +55,7 @@ export default function PharmacistPrescriptions() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       setPrescriptions(response.data);
       setError(null);
@@ -87,8 +86,8 @@ export default function PharmacistPrescriptions() {
   // Load prescriptions on component mount
   useEffect(() => {
     console.log(
-      "Environment variable NEXT_PUBLIC_API_URL:",
-      process.env.NEXT_PUBLIC_API_URL
+      "Environment variable NEXT_PUBLIC_BACKEND_URL:",
+      process.env.NEXT_PUBLIC_BACKEND_URL,
     );
     fetchPrescriptions();
   }, []);
