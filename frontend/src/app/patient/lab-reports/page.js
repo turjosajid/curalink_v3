@@ -9,6 +9,7 @@ export default function PatientLabReportsPage() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -27,14 +28,12 @@ export default function PatientLabReportsPage() {
 
         // Fetch all appointments for the patient
         const response = await axios.get(
-          `${
-            process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
-          }/api/appointments/patient/${patientId}`,
+          `${API_URL}/api/appointments/patient/${patientId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         // Extract all diagnostic reports from appointments
@@ -51,7 +50,7 @@ export default function PatientLabReportsPage() {
                 appointmentId: appointment._id,
                 appointmentDate: appointment.date,
                 doctorName: appointment.doctor?.name || "Unknown Doctor",
-              })
+              }),
             );
             allReports.push(...reportsWithContext);
           }
@@ -59,7 +58,7 @@ export default function PatientLabReportsPage() {
 
         // Sort reports by upload date (newest first)
         allReports.sort(
-          (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
+          (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt),
         );
 
         setReports(allReports);
