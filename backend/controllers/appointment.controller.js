@@ -222,7 +222,7 @@ const addDiagnosticReport = async (req, res) => {
     }
 
     // Generate full file URL (including backend URL)
-    const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
+    const backendUrl = process.env.BACKEND_URL;
     const fileUrl = `${backendUrl}/uploads/${path.basename(req.file.path)}`;
 
     // Add the diagnostic report to the appointment
