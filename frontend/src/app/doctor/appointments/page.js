@@ -8,11 +8,12 @@ const AppointmentsPage = () => {
   const [appointments, setAppointments] = useState([]);
   const [user, setUser] = useState(null);
   const router = useRouter();
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const fetchAppointments = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/doctors/${user}/appointments`
+        `${API_URL}/api/doctors/${user}/appointments`
       );
       console.log("Fetched appointments:", response.data); // Debugging line to check fetched data
       // Filter out completed and rejected appointments
@@ -46,7 +47,7 @@ const AppointmentsPage = () => {
 
     try {
       await axios.delete(
-        `http://localhost:5000/api/doctors/appointments/${appointmentId}`
+        `${API_URL}/api/doctors/appointments/${appointmentId}`
       );
       alert("Appointment deleted successfully!");
       setAppointments(
