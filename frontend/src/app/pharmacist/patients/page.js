@@ -15,8 +15,7 @@ export default function PharmacistPatients() {
   const router = useRouter();
 
   // Get API URL from environment variable with fallback
-  const API_URL =
-    process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   // Fetch all patients with prescription history
   const fetchPatients = async () => {
