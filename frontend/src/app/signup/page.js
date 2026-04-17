@@ -9,7 +9,7 @@ export default function SignUp() {
     const password = e.target[2].value;
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/signup", {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/signup`, {
         name,
         email,
         password,
