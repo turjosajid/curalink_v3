@@ -10,6 +10,7 @@ const AvailabilityPage = () => {
     endTime: "10:00",
   });
   const [userId, setUserId] = useState(null);
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     setUserId(localStorage.getItem("userId"));
@@ -20,7 +21,7 @@ const AvailabilityPage = () => {
     const fetchAvailableSlots = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/doctors/${userId}/available-slots`
+          `${API_URL}/api/doctors/${userId}/available-slots`,
         );
         setWeeklyRecurringSlots(response.data.weeklyRecurringSlots || []);
       } catch (error) {
@@ -34,8 +35,8 @@ const AvailabilityPage = () => {
   const addWeeklySlot = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/doctors/${userId}/weekly-slots`,
-        newWeeklySlot
+        `${API_URL}/api/doctors/${userId}/weekly-slots`,
+        newWeeklySlot,
       );
       setWeeklyRecurringSlots(response.data.weeklyRecurringSlots);
       // Reset form to default values
@@ -52,11 +53,11 @@ const AvailabilityPage = () => {
   const deleteWeeklySlot = async (slotId) => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/doctors/${userId}/weekly-slots/${slotId}`
+        `${API_URL}/api/doctors/${userId}/weekly-slots/${slotId}`,
       );
       // Remove the deleted slot from state
       setWeeklyRecurringSlots(
-        weeklyRecurringSlots.filter((slot) => slot._id !== slotId)
+        weeklyRecurringSlots.filter((slot) => slot._id !== slotId),
       );
     } catch (error) {
       console.error("Error deleting weekly slot:", error);
