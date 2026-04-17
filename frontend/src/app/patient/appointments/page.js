@@ -11,6 +11,7 @@ export default function PatientAppointments() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -28,19 +29,17 @@ export default function PatientAppointments() {
 
         // Fetch all patient appointments using axios
         const response = await axios.get(
-          `${
-            process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
-          }/api/appointments/patient/${userId}`,
+          `${API_URL}/api/appointments/patient/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         // Filter out completed appointments
         const activeAppointments = response.data.filter(
-          (appointment) => appointment.status !== "completed"
+          (appointment) => appointment.status !== "completed",
         );
 
         setAppointments(activeAppointments);
@@ -102,11 +101,11 @@ export default function PatientAppointments() {
       </div>
     );
   }
-// appointment page myappoint e click then pathient book-appoint page go
+  // appointment page myappoint e click then pathient book-appoint page go
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Appointments</h1>  
+        <h1 className="text-2xl font-bold">My Appointments</h1>
         <div className="flex gap-2">
           <Button
             onClick={() => router.push("/patient/book-appointment")}
@@ -150,7 +149,7 @@ export default function PatientAppointments() {
                 </h2>
                 <span
                   className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(
-                    appointment.status
+                    appointment.status,
                   )}`}
                 >
                   {appointment.status.charAt(0).toUpperCase() +
