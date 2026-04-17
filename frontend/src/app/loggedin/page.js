@@ -9,6 +9,7 @@ export default function LoggedInPage() {
   const [personal_details, setPersonalDetails] = useState(null);
   const [role, setRole] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     setIsVisible(true);
@@ -26,12 +27,9 @@ export default function LoggedInPage() {
           return;
         }
 
-        const response = await axios.get(
-          `http://localhost:5000/api/users/${userId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axios.get(`${API_URL}/api/users/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setUser(response.data);
 
         let fl = localStorage.getItem("firstlogin");
@@ -39,9 +37,9 @@ export default function LoggedInPage() {
           console.log("You need to set your role first");
 
           await axios.put(
-            `http://localhost:5000/api/users/${userId}`,
+            `${API_URL}/api/users/${userId}`,
             { firstlogin: false },
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } },
           );
 
           localStorage.setItem("firstlogin", "false");
@@ -53,10 +51,10 @@ export default function LoggedInPage() {
         setRole(user_role);
 
         const personalDetailsResponse = await axios.get(
-          `http://localhost:5000/api/${user_role}-profiles/${userId}`,
+          `${API_URL}/api/${user_role}-profiles/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
         setPersonalDetails(personalDetailsResponse.data);
       } catch (err) {
