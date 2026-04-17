@@ -7,6 +7,7 @@ export default function SetDetails() {
   const [role, setRole] = useState(null);
   const [userId, setUserId] = useState(null);
   const router = useRouter();
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     const userRole = localStorage.getItem("role");
@@ -30,7 +31,7 @@ export default function SetDetails() {
 
     try {
       await axios.post(
-        `http://localhost:5000/api/doctor-profiles/`,
+        `${API_URL}/api/doctor-profiles/`,
         {
           user: userId,
           specialization,
@@ -45,7 +46,7 @@ export default function SetDetails() {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       alert("Doctor details updated successfully!");
       router.push("/loggedin");
@@ -72,7 +73,7 @@ export default function SetDetails() {
 
     try {
       await axios.post(
-        `http://localhost:5000/api/patient-profiles/`,
+        `${API_URL}/api/patient-profiles/`,
         {
           user: userId,
           age: parseInt(age, 10),
@@ -92,7 +93,7 @@ export default function SetDetails() {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       alert("Patient details updated successfully!");
       router.push("/loggedin");
@@ -109,7 +110,7 @@ export default function SetDetails() {
 
     try {
       await axios.post(
-        `http://localhost:5000/api/pharmacist-profiles/`,
+        `${API_URL}/api/pharmacist-profiles/`,
         {
           user: userId,
           pharmacyName,
@@ -121,7 +122,7 @@ export default function SetDetails() {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       alert("Pharmacist details updated successfully!");
       router.push("/loggedin");
@@ -145,8 +146,8 @@ export default function SetDetails() {
             role === "doctor"
               ? handleDoctorSubmit
               : role === "patient"
-              ? handlePatientSubmit
-              : handlePharmacistSubmit
+                ? handlePatientSubmit
+                : handlePharmacistSubmit
           }
         >
           {role === "doctor" && (
