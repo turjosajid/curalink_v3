@@ -22,6 +22,7 @@ export default function ScheduleAppointmentPage() {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [availableDateTimes, setAvailableDateTimes] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -36,9 +37,7 @@ export default function ScheduleAppointmentPage() {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/patient-profiles"
-        );
+        const response = await axios.get(`${API_URL}/api/patient-profiles`);
         console.log("Fetched patients:", response.data);
         setPatients(response.data);
         setLoading(false);
@@ -55,7 +54,7 @@ export default function ScheduleAppointmentPage() {
   const fetchAvailableSlots = async (doctorId) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/doctors/${doctorId}/available-slots`
+        `${API_URL}/api/doctors/${doctorId}/available-slots`,
       );
       const slots = response.data.weeklyRecurringSlots || [];
       setAvailableSlots(slots);
@@ -141,7 +140,7 @@ export default function ScheduleAppointmentPage() {
     // Ensure we're checking against slots that we actually offered in the dropdown
     // This is a more direct comparison to what we generated
     return availableDateTimes.some((week) =>
-      week.slots.some((slot) => slot.dateTimeStr === dateTime)
+      week.slots.some((slot) => slot.dateTimeStr === dateTime),
     );
   };
 
@@ -162,7 +161,7 @@ export default function ScheduleAppointmentPage() {
     // Check if the selected time is within the doctor's available slots
     if (!isTimeAvailable(formData.date)) {
       setFormError(
-        "The selected time is not within your available slots. Please select an available time."
+        "The selected time is not within your available slots. Please select an available time.",
       );
       return;
     }
@@ -180,8 +179,8 @@ export default function ScheduleAppointmentPage() {
       console.log("Sending appointment data:", appointmentData);
 
       const response = await axios.post(
-        "http://localhost:5000/api/doctors/appointments",
-        appointmentData
+        `${API_URL}/api/doctors/appointments`,
+        appointmentData,
       );
 
       console.log("Appointment created:", response.data);
