@@ -9,6 +9,7 @@ const PastConsultationsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     const fetchConsultations = async () => {
@@ -21,9 +22,7 @@ const PastConsultationsPage = () => {
 
         // Fetch past consultations using the doctor ID with the correct backend URL
         const response = await axios.get(
-          `${
-            process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
-          }/api/doctors/${doctorId}/past-consultations`
+          `${API_URL}/api/doctors/${doctorId}/past-consultations`,
         );
 
         setConsultations(response.data);
