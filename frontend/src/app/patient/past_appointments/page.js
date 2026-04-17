@@ -13,6 +13,7 @@ export default function PatientPastAppointmentsPage() {
   const [selectedPrescription, setSelectedPrescription] = useState(null);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const router = useRouter();
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     const fetchPastAppointments = async () => {
@@ -31,14 +32,12 @@ export default function PatientPastAppointmentsPage() {
 
         // Fetch past appointments using the patient ID
         const response = await axios.get(
-          `${
-            process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
-          }/api/appointments/patient/${patientId}/completed`,
+          `${API_URL}/api/appointments/patient/${patientId}/completed`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         setPastAppointments(response.data);
