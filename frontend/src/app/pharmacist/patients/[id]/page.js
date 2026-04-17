@@ -17,8 +17,7 @@ export default function PatientPrescriptions() {
   const patientId = params.id;
 
   // Get API URL from environment variable with fallback
-  const API_URL =
-    process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     // Check if we have a token (user is logged in)
@@ -40,12 +39,12 @@ export default function PatientPrescriptions() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         // Filter prescriptions for this specific patient
         const patientPrescriptions = prescriptionsResponse.data.filter(
-          (prescription) => prescription.patient._id === patientId
+          (prescription) => prescription.patient._id === patientId,
         );
 
         setPrescriptions(patientPrescriptions);
@@ -62,7 +61,7 @@ export default function PatientPrescriptions() {
                 headers: {
                   Authorization: `Bearer ${token}`,
                 },
-              }
+              },
             );
             setPatientData(userResponse.data);
           } catch (err) {
@@ -91,7 +90,7 @@ export default function PatientPrescriptions() {
   // Update function to navigate to prescription details page with patient context
   const handleViewPrescription = (prescription) => {
     router.push(
-      `/pharmacist/prescriptions/${prescription._id}?fromPatient=true&patientId=${patientId}`
+      `/pharmacist/prescriptions/${prescription._id}?fromPatient=true&patientId=${patientId}`,
     );
   };
 
