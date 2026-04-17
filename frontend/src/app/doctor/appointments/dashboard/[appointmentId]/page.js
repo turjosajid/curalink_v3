@@ -13,13 +13,14 @@ export default function AppointmentDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("details");
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     const fetchAppointmentData = async () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/api/appointments/${appointmentId}/dashboard`,
+          `${API_URL}/api/appointments/${appointmentId}/dashboard`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ export default function AppointmentDashboard() {
               try {
                 const token = localStorage.getItem("token");
                 const response = await axios.put(
-                  `http://localhost:5000/api/appointments/${appointmentId}/complete`,
+                  `${API_URL}/api/appointments/${appointmentId}/complete`,
                   {},
                   {
                     headers: {
@@ -217,7 +218,7 @@ function DiagnosisTab({ appointment, setAppointment, appointmentId }) {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
-        `http://localhost:5000/api/appointments/${appointmentId}/diagnosis`,
+        `${API_URL}/api/appointments/${appointmentId}/diagnosis`,
         {
           diagnosis,
           notes,
@@ -357,7 +358,7 @@ function PrescriptionTab({ appointment, setAppointment, appointmentId }) {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        `http://localhost:5000/api/appointments/${appointmentId}/prescription`,
+        `${API_URL}/api/appointments/${appointmentId}/prescription`,
         {
           medications,
           notes,
@@ -564,7 +565,7 @@ function ReportsTab({ appointment, setAppointment, appointmentId }) {
       formData.append("file", file);
 
       const response = await axios.post(
-        `http://localhost:5000/api/appointments/${appointmentId}/diagnostic-report`,
+        `${API_URL}/api/appointments/${appointmentId}/diagnostic-report`,
         formData,
         {
           headers: {
@@ -712,7 +713,7 @@ function MedicalRecordTab({ appointment, setAppointment, appointmentId }) {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
-        `http://localhost:5000/api/appointments/${appointmentId}/medical-record`,
+        `${API_URL}/api/appointments/${appointmentId}/medical-record`,
         {
           diagnosis,
           notes,
